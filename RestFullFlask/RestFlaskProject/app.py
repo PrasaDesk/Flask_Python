@@ -1,5 +1,5 @@
 from config import app, db
-from user.view import register, getUsers, getOne, updateUser, deleteUser, userLogin
+from user.view import register, getUsers, getOne, updateUser, deleteUser, userLogin, UserLogoutAccess, TokenRefresh
 from flask_restful import Resource, Api
 from product.view import AddProduct, GetAllProducts
 
@@ -12,6 +12,8 @@ api.add_resource(getOne, '/user/<string:id>')
 api.add_resource(updateUser, '/user/<string:id>')
 api.add_resource(deleteUser, '/user/<string:id>')
 api.add_resource(userLogin, '/login')
+api.add_resource(UserLogoutAccess, '/logout')
+api.add_resource(TokenRefresh, '/refresh')
 
 api.add_resource(AddProduct, '/product')
 api.add_resource(GetAllProducts, '/product')

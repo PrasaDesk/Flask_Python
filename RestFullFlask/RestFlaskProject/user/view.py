@@ -1,6 +1,6 @@
-from config import app, db
+from config import app, db, jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-from .model import RestFull_User
+from .model import RestFull_User, RevokedTokenModel
 from flask_restful import Resource
 from flask import jsonify, request
 from .form import user_schema, users_schema
@@ -131,3 +131,30 @@ class userLogin(Resource):
             return "Invalid Credentials", 400
 
         return data, 200
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return RevokedTokenModel.is_jti_blacklisted(jti)
+
+
+class UserLogoutAccess(Resource):
+    @jwt_required
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        try:
+            print(check_if_token_in_blacklist(get_raw_jwt()))
+            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token.add()
+            return {'message': 'Access token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+
+class TokenRefresh(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity = current_user)
+        return {'access_token': access_token}
