@@ -1,10 +1,11 @@
 from config import app, db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from .model import RestFull_User
 from flask_restful import Resource
 from flask import jsonify, request
 from .form import user_schema, users_schema
 import re
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt
 
 
 class register(Resource):
@@ -32,20 +33,32 @@ class register(Resource):
 
         # Data save in Database And try to use inbuilt exception for unique Constarint
 
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='md5')
         new_user = RestFull_User(username=username,
                                  email=email,
                                  password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        return "new user added",201
+        tempUsr = RestFull_User.query.filter(RestFull_User.username == username).one_or_none()
+
+        access_token = create_access_token(identity= tempUsr.id)
+        refresh_token = create_refresh_token(identity= tempUsr.id)
+
+        data = {
+            "msg": "New User Created",
+            "access_token": access_token,
+            "refresh_token" : refresh_token
+        }
+        return data, 201
 
 
 class getUsers(Resource):
+    @jwt_required
     def get(self):
         users = RestFull_User.query.all()
         result = users_schema.dump(users)
+        print(get_raw_jwt())
         return jsonify(result.data)
 
 
@@ -94,3 +107,27 @@ class deleteUser(Resource):
         db.session.commit()
 
         return user_schema.jsonify(user)
+
+
+class userLogin(Resource):
+    def post(self):
+        username = request.json['username']
+        password = request.json['password']
+
+        tempUsr = RestFull_User.query.filter(RestFull_User.username == username).one_or_none()
+
+        if not tempUsr:
+            return "Invalid Credentials", 400
+
+        if check_password_hash(tempUsr.password, password):
+            access_token = create_access_token(identity=tempUsr.id)
+            refresh_token = create_refresh_token(identity=tempUsr.id)
+            data = {
+                    "msg": "User Logged in As " + username,
+                    "access_token": access_token,
+                    "refresh_token": refresh_token
+            }
+        else:
+            return "Invalid Credentials", 400
+
+        return data, 200
