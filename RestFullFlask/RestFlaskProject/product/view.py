@@ -11,6 +11,9 @@ class AddProduct(Resource):
         price = request.json['price']
         user_id=request.json['user_id']
 
+        print("\n\nAdd Product\n\n")
+        print(name, price, user_id)
+
         if name == '' or price == '':
             return "field is Empty", 400
 

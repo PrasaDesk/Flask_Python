@@ -11,6 +11,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 api = Api(app)
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -32,6 +33,8 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 # endpoint to create new user
+
+
 @app.route("/user", methods=["POST"])
 def add_user():
     print(request.json)
@@ -46,6 +49,8 @@ def add_user():
     return "new user add"
 
 # endpoint to show all users
+
+
 @app.route("/user", methods=["GET"])
 def get_user():
     all_users = User.query.all()

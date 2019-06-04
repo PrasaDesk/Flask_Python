@@ -4,7 +4,7 @@ from flask_restful import Resource, Api
 from product.view import AddProduct, GetAllProducts
 
 api = Api(app)
-app.config['SWAGGER'] = {"title" : "Swagger-UI", "uiversion": 2}
+app.config['SWAGGER'] = {"title": "Swagger-UI", "uiversion": 2}
 
 api.add_resource(register, '/user')
 api.add_resource(getUsers, '/user')
@@ -21,4 +21,4 @@ api.add_resource(GetAllProducts, '/product')
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5100)
