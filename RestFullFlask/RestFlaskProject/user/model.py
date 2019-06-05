@@ -22,20 +22,3 @@ class RevokedTokenModel(db.Model):
     def is_jti_blacklisted(cls, jti):
         query = cls.query.filter_by(jti=jti).first()
         return bool(query)
-
-
-class TempModel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    temp = db.Column(db.String(120))
-    tempDemo = db.Column(db.String(120))
-
-
-class shubhamModel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    temp = db.Column(db.String(120))
-    shubhamDemo = db.Column(db.String(120))
-
-
-class floatData(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float, default=0.0)

@@ -10,7 +10,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 
 class register(Resource):
     def post(self):
-        print('jason = ',request.json)
+        print('jason = ', request.json)
         username = request.json['username']
         email = request.json['email']
         password = request.json['password']
@@ -20,7 +20,7 @@ class register(Resource):
             return "ERROR: Empty Data", 400
 
         # Email validation with RegEx and for duplication
-        emailre = r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$";
+        emailre = r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
 
         if email != "":
             if not re.match(emailre, email):
@@ -40,15 +40,16 @@ class register(Resource):
         db.session.add(new_user)
         db.session.commit()
 
-        tempUsr = RestFull_User.query.filter(RestFull_User.username == username).one_or_none()
+        tempUsr = RestFull_User.query.filter(
+            RestFull_User.username == username).one_or_none()
 
-        access_token = create_access_token(identity= tempUsr.id)
-        refresh_token = create_refresh_token(identity= tempUsr.id)
+        access_token = create_access_token(identity=tempUsr.id)
+        refresh_token = create_refresh_token(identity=tempUsr.id)
 
         data = {
             "msg": "New User Created",
             "access_token": access_token,
-            "refresh_token" : refresh_token
+            "refresh_token": refresh_token
         }
         return data, 201
 
@@ -67,7 +68,7 @@ class getOne(Resource):
         data = RestFull_User.query.get(id)
 
         if not data:
-            return {"Error":"There is No user with User_ID : "+id}
+            return {"Error": "There is No user with User_ID : "+id}
 
         result = user_schema.dump(data)
         return jsonify(result.data)
@@ -82,7 +83,7 @@ class updateUser(Resource):
         if username == '':
             return "ERROR: Empty Data", 400
 
-        emailre = r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$";
+        emailre = r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
 
         if email != "":
             if not re.match(emailre, email):
@@ -114,7 +115,8 @@ class userLogin(Resource):
         username = request.json['username']
         password = request.json['password']
 
-        tempUsr = RestFull_User.query.filter(RestFull_User.username == username).one_or_none()
+        tempUsr = RestFull_User.query.filter(
+            RestFull_User.username == username).one_or_none()
 
         if not tempUsr:
             return "Invalid Credentials", 400
@@ -123,9 +125,9 @@ class userLogin(Resource):
             access_token = create_access_token(identity=tempUsr.id)
             refresh_token = create_refresh_token(identity=tempUsr.id)
             data = {
-                    "msg": "User Logged in As " + username,
-                    "access_token": access_token,
-                    "refresh_token": refresh_token
+                "msg": "User Logged in As " + username,
+                "access_token": access_token,
+                "refresh_token": refresh_token
             }
         else:
             return "Invalid Credentials", 400
@@ -145,7 +147,7 @@ class UserLogoutAccess(Resource):
         jti = get_raw_jwt()['jti']
         try:
             print(check_if_token_in_blacklist(get_raw_jwt()))
-            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
             return {'message': 'Access token has been revoked'}
         except:
@@ -156,5 +158,5 @@ class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
-        access_token = create_access_token(identity = current_user)
+        access_token = create_access_token(identity=current_user)
         return {'access_token': access_token}

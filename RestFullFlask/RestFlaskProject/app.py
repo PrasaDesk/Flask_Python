@@ -1,7 +1,7 @@
 from config import app, db
 from user.view import register, getUsers, getOne, updateUser, deleteUser, userLogin, UserLogoutAccess, TokenRefresh
 from flask_restful import Resource, Api
-from product.view import AddProduct, GetAllProducts
+from product.view import AddProduct, GetAllProducts, Product_Create
 
 api = Api(app)
 app.config['SWAGGER'] = {"title": "Swagger-UI", "uiversion": 2}
@@ -17,7 +17,7 @@ api.add_resource(TokenRefresh, '/refresh')
 
 api.add_resource(AddProduct, '/product')
 api.add_resource(GetAllProducts, '/product')
-
+api.add_resource(Product_Create, '/addproduct')
 
 if __name__ == '__main__':
     db.create_all()

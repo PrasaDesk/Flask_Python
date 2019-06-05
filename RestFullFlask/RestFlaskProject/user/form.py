@@ -1,6 +1,7 @@
 from config import ma
 from .model import RestFull_User
 
+
 class registerForm(ma.Schema):
     class Meta:
         model = RestFull_User
@@ -10,9 +11,6 @@ class registerForm(ma.Schema):
 
 user_schema = registerForm()
 users_schema = registerForm(many=True)
-
-
-
 
 
 # ########################################################################################
