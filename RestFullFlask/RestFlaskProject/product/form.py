@@ -13,7 +13,7 @@ product_schema = ProductForm()
 products_schema = ProductForm(many=True)
 
 
-class ProductSchema(Schema):
+class ProductSchema(ma.Schema):
     """
     User Schema
     """

@@ -4,6 +4,7 @@ from flask_marshmallow import Marshmallow
 # from flask_swagger_ui import get_swaggerui_blueprint
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from flask_mail import Mail
 
 app = Flask(__name__)
 
@@ -13,9 +14,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhos
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config.update(
+    # EMAIL SETTINGS
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME='prasad.yeole@mindbowser.com',
+    MAIL_PASSWORD='Prasad@2916'
+)
+
 
 db = SQLAlchemy(app)
 
+mail = Mail(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)

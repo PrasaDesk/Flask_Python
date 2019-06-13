@@ -1,9 +1,13 @@
-from config import app, db
+from config import app, db, mail
 from flask_restful import Resource
-from flask import jsonify, request
+from flask import jsonify, request, Flask, url_for, send_from_directory, send_file
 from .model import Product
 from .form import product_schema, products_schema, ProductSchema
 from user.model import RestFull_User
+import logging
+import os
+from werkzeug import secure_filename
+from flask_mail import Mail, Message
 
 
 class AddProduct(Resource):
@@ -41,13 +45,47 @@ class GetAllProducts(Resource):
         return jsonify(result.data)
 
 
-class Product_Create(Resource):
+# file_handler = logging.FileHandler('server.log')
+# app.logger.addHandler(file_handler)
+# app.logger.setLevel(logging.INFO)
+
+PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
+UPLOAD_FOLDER = '{}/uploads/'.format(PROJECT_HOME)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+# def create_new_folder(local_dir):
+#     newpath = local_dir
+#     if not os.path.exists(newpath):
+#         os.makedirs(newpath)
+#     return newpath
+
+
+class UploadImage(Resource):
     def post(self):
-        data = request.get_json()
+        if request.files['image']:
+            img = request.files['image']
+            img_name = secure_filename(img.filename)
+            # create_new_folder(app.config['UPLOAD_FOLDER'])
+            saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
+            # app.logger.info("saving {}".format(saved_path))
+            img.save(saved_path)
+            print("\n\n", saved_path, "\n\n")
+            return send_from_directory(app.config['UPLOAD_FOLDER'], img_name, as_attachment=True)
 
-        prod = ProductSchema(data)
-        print(prod)
-        db.session.add(prod)
-        db.session.commit()
+        else:
+            return "Where is the image?"
 
-        return "new product added"
+
+class SendMail(Resource):
+
+    def post(self):
+        email = request.json['email']
+
+        msg = Message("Send Mail Tutorial!",
+                      sender="yoursendingemail@gmail.com",
+                      recipients=[email])
+        msg.body = "Yo!\nHave you heard the good word of Python???"
+        mail.send(msg)
+
+        return "email send"
